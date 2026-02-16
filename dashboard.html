@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<script>
+if(!localStorage.getItem("loggedIn") || localStorage.getItem("role") !== "admin"){
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="navbar">
+    <h3>Admin Dashboard</h3>
+    <button id="logoutBtn">Logout</button>
+</div>
+
+<div class="dashboard">
+    <div class="stat-box">
+        <h2 id="totalCourses">0</h2>
+        <p>Total Courses</p>
+    </div>
+
+    <div class="stat-box">
+        <h2 id="totalAdmissions">0</h2>
+        <p>Total Admissions</p>
+    </div>
+</div>
+
+<div class="table-container">
+    <h2>Admission Records</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="admissionTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+$(function(){
+
+    // Load course count
+    $.ajax({
+        url: "data/courses.xml",
+        dataType: "xml",
+        success: function(xml){
+            $("#totalCourses").text($(xml).find("course").length);
+        }
+    });
+
+    function loadAdmissions(){
+
+        let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+
+        $("#totalAdmissions").text(admissions.length);
+
+        let rows = "";
+
+        admissions.forEach(function(adm, index){
+
+            rows += `
+                <tr>
+                    <td>${adm.name}</td>
+                    <td>${adm.email}</td>
+                    <td>${adm.phone}</td>
+                    <td>${adm.course}</td>
+                    <td>
+                        <button class="deleteBtn" data-index="${index}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $("#admissionTableBody").html(rows);
+    }
+
+    loadAdmissions();
+
+    // Delete admission
+    $(document).on("click", ".deleteBtn", function(){
+
+        let index = $(this).data("index");
+
+        let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+
+        admissions.splice(index, 1);
+
+        localStorage.setItem("admissions", JSON.stringify(admissions));
+
+        loadAdmissions();
+    });
+
+    $("#logoutBtn").click(function(){
+        localStorage.removeItem("loggedIn");
+        localStorage.removeItem("role");
+        window.location.href = "login.html";
+    });
+
+});
+</script>
+
+</body>
+</html>

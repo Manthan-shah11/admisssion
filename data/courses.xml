@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<courses>
+    <course>
+        <name>BCA</name>
+        <duration>3 Years</duration>
+        <fees>45000</fees>
+    </course>
+    <course>
+        <name>BBA</name>
+        <duration>3 Years</duration>
+        <fees>50000</fees>
+    </course>
+    <course>
+        <name>MCA</name>
+        <duration>2 Years</duration>
+        <fees>70000</fees>
+    </course>
+</courses>

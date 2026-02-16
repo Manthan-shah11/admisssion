@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Courses</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<script>
+if(!localStorage.getItem("loggedIn") || localStorage.getItem("role") !== "student"){
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="navbar">
+    <h3>Available Courses</h3>
+    <button id="logoutBtn">Logout</button>
+</div>
+
+<div class="box">
+    <button id="loadBtn">Load Courses</button>
+    <div id="courseList"></div>
+</div>
+
+<script>
+$(function(){
+
+    $("#logoutBtn").click(function(){
+        localStorage.removeItem("loggedIn");
+        localStorage.removeItem("role");
+        localStorage.removeItem("selectedCourse");
+        window.location.href = "login.html";
+    });
+
+    $("#loadBtn").click(function(){
+
+        $.ajax({
+            url: "data/courses.xml",
+            dataType: "xml",
+            success: function(xml){
+
+                let output = "";
+
+                $(xml).find("course").each(function(){
+
+                    let name = $(this).find("name").text();
+                    let duration = $(this).find("duration").text();
+                    let fees = $(this).find("fees").text();
+
+                    output += `
+                        <div class="card">
+                            <h3>${name}</h3>
+                            <p>Duration: ${duration}</p>
+                            <p>Fees: ₹${fees}</p>
+                            <button class="applyBtn" data-course="${name}">
+                                Apply Now
+                            </button>
+                        </div>
+                    `;
+                });
+
+                $("#courseList").html(output);
+            }
+        });
+
+    });
+
+    $(document).on("click", ".applyBtn", function(){
+        let selectedCourse = $(this).data("course");
+        localStorage.setItem("selectedCourse", selectedCourse);
+        window.location.href = "admission.html";
+    });
+
+});
+</script>
+
+</body>
+</html>

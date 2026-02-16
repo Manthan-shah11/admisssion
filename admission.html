@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admission Form</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<script>
+if(!localStorage.getItem("loggedIn") || localStorage.getItem("role") !== "student"){
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="navbar">
+    <h3>Admission Form</h3>
+    <button id="logoutBtn">Logout</button>
+</div>
+
+<div class="box">
+    <h2>Apply for Course</h2>
+
+    <form id="admissionForm">
+        <input type="text" id="name" placeholder="Full Name">
+        <small class="error" id="nameError"></small>
+
+        <input type="email" id="email" placeholder="Email">
+        <small class="error" id="emailError"></small>
+
+        <input type="text" id="phone" placeholder="Contact Number">
+        <small class="error" id="phoneError"></small>
+
+        <select id="course">
+            <option value="">Select Course</option>
+            <option>BCA</option>
+            <option>BBA</option>
+            <option>MCA</option>
+        </select>
+        <small class="error" id="courseError"></small>
+
+        <button type="submit">Submit</button>
+        <p id="successMessage" style="color:lightgreen; margin-top:10px;"></p>
+    </form>
+</div>
+
+<script>
+$(function(){
+
+    let savedCourse = localStorage.getItem("selectedCourse");
+    if(savedCourse){
+        $("#course").val(savedCourse);
+    }
+
+    $("#logoutBtn").click(function(){
+        localStorage.removeItem("loggedIn");
+        localStorage.removeItem("role");
+        localStorage.removeItem("selectedCourse");
+        window.location.href = "login.html";
+    });
+
+    $("#admissionForm").submit(function(e){
+        e.preventDefault();
+
+        let name = $("#name").val().trim();
+        let email = $("#email").val().trim();
+        let phone = $("#phone").val().trim();
+        let course = $("#course").val();
+
+        let valid = true;
+
+        $(".error").text("");
+
+        if(name.length < 3){
+            $("#nameError").text("Name must be at least 3 characters");
+            valid = false;
+        }
+
+        if(!/^\S+@\S+\.\S+$/.test(email)){
+            $("#emailError").text("Enter valid email");
+            valid = false;
+        }
+
+        if(!/^[0-9]{10}$/.test(phone)){
+            $("#phoneError").text("Phone must be 10 digits");
+            valid = false;
+        }
+
+        if(course === ""){
+            $("#courseError").text("Select a course");
+            valid = false;
+        }
+
+        if(!valid) return;
+
+        let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+
+        admissions.push({ name, email, phone, course });
+
+        localStorage.setItem("admissions", JSON.stringify(admissions));
+
+        $("#successMessage").text("Admission Submitted Successfully!");
+        $("#admissionForm")[0].reset();
+    });
+
+});
+</script>
+
+</body>
+</html>
